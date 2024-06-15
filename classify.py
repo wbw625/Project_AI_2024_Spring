@@ -17,7 +17,7 @@ class ViolenceDataset(Dataset):
     def _load_data(self):
         for filename in os.listdir(self.folder_path):
             if filename.lower().endswith(('.jpg', '.jpeg', '.png')):
-                label = 1 if 'violence' in filename.lower() else 0  
+                label = int(filename.split('_')[0])  # 从文件名提取标签
                 self.labels.append(label)
                 img_path = os.path.join(self.folder_path, filename)
                 try:
@@ -38,10 +38,10 @@ class ViolenceDataset(Dataset):
 
 class ViolenceClass:
     def __init__(self, model_path):
-        self.device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
-        os.environ["CUDA_VISIBLE_DEVICES"] = "0" if torch.cuda.is_available() else ""
+        self.device = 'cpu'  # 使用CPU
+        os.environ["CUDA_VISIBLE_DEVICES"] = ""  # 禁用GPU
         self.VioCL = ViolenceClassifier.load_from_checkpoint(model_path).to(device=self.device)
-        self.trainer = Trainer(accelerator='gpu' if torch.cuda.is_available() else 'cpu', devices=[0] if torch.cuda.is_available() else 1)
+        self.trainer = Trainer(accelerator='cpu', devices=1)  # 使用CPU
 
     def classify(self, imgs: torch.Tensor):
         pred_dataloader = DataLoader(imgs, batch_size=imgs.size(0))
@@ -94,12 +94,14 @@ class ViolenceClass:
         print(f"Accuracy on the test set: {accuracy * 100:.2f}%")
         return accuracy
 
-
 # 示例用法
 if __name__ == "__main__":
-    model_path = 'train_logs/resnet18_pretrain_test/version_1/checkpoints/resnet18_pretrain_test-epoch=35-val_loss=0.00.ckpt'
+    model_path = 'train_logs/resnet18_pretrain_test/version_2/checkpoints/resnet18_pretrain_test-epoch=20-val_loss=0.03.ckpt'
     classifier = ViolenceClass(model_path)
     folder_path = 'violence_224/val'
+    #folder_path = 'violence_224/train_set2'
+    #folder_path = 'violence_224/train_set3'
+    #folder_path = 'violence_224/train_set4'
     folder_predictions = classifier.classify_folder(folder_path)
     print(f'Folder image predictions: {folder_predictions}')
 
