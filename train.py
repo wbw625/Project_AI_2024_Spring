@@ -8,7 +8,7 @@ from dataset import CustomDataModule
 
 if __name__ == '__main__':
     gpu_id = [1]
-    lr = 3e-4
+    lr = 1e-3
     batch_size = 128
     log_name = "resnet18_pretrain_test"
     print("{} gpu: {}, batch size: {}, lr: {}".format(log_name, gpu_id, batch_size, lr))
@@ -25,7 +25,7 @@ if __name__ == '__main__':
 
     # 实例化训练器，移除GPU相关设置
     trainer = Trainer(
-        max_epochs=40,
+        max_epochs=30,
         accelerator='cpu',  # 使用CPU进行训练
         logger=logger,
         callbacks=[checkpoint_callback]

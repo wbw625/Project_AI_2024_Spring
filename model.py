@@ -1,10 +1,10 @@
 import torch
-from torch import nn
-import numpy as np
+import torch.nn.functional as F
+import torch.nn as nn
+from torch.nn import BCEWithLogitsLoss
 from torchvision import models
 from torchmetrics import Accuracy
 from pytorch_lightning import LightningModule
-
 
 class ViolenceClassifier(LightningModule):
     def __init__(self, num_classes=2, learning_rate=1e-3):
@@ -12,10 +12,12 @@ class ViolenceClassifier(LightningModule):
         self.model = models.resnet18(pretrained=True)
         num_ftrs = self.model.fc.in_features
         self.model.fc = nn.Linear(num_ftrs, num_classes)
-        # self.model = models.resnet18(pretrained=False, num_classes=2)
 
         self.learning_rate = learning_rate
-        self.loss_fn = nn.CrossEntropyLoss()  # 交叉熵损失
+        # 定义权重，假设类别0的权重为2，类别1的权重为1
+        weights = torch.tensor([2, 1], dtype=torch.float)
+        # 定义新的损失函数
+        self.loss_fn = BCEWithLogitsLoss(pos_weight=weights)
         self.accuracy = Accuracy(task="multiclass", num_classes=2)
 
     def forward(self, x):
@@ -28,22 +30,7 @@ class ViolenceClassifier(LightningModule):
     def training_step(self, batch, batch_idx):
         x, y = batch
         logits = self(x)
-        loss = self.loss_fn(logits, y)
-        self.log('train_loss', loss)
-        return loss
-
-    def validation_step(self, batch, batch_idx):
-        x, y = batch
-        logits = self(x)
-        loss = self.loss_fn(logits, y)
-        acc = self.accuracy(logits, y)
-        self.log('val_loss', loss)
-        self.log('val_acc', acc)
-        return loss
-    
-    def test_step(self, batch, batch_idx):
-        x, y = batch
-        logits = self(x)
-        acc = self.accuracy(logits, y)
-        self.log('test_acc', acc)
+        # 将目标转换为one-hot编码
+        y_onehot = F.one_hot(y, num_classes=2)
+        loss = self.loss_fn(logits, y_onehot.float())
         return loss
