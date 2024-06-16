@@ -34,3 +34,10 @@ class ViolenceClassifier(LightningModule):
         y_onehot = F.one_hot(y, num_classes=2)
         loss = self.loss_fn(logits, y_onehot.float())
         return loss
+    
+    def validation_step(self, batch, batch_idx):
+        x, y = batch
+        logits = self(x)
+        y_onehot = F.one_hot(y, num_classes=2)
+        val_loss = self.loss_fn(logits, y_onehot.float())
+        self.log('val_loss', val_loss)
