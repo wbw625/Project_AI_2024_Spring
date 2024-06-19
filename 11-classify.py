@@ -1,3 +1,6 @@
+import sys
+sys.path.insert(0, './11-其他支持文件和目录')
+
 import torch
 import os
 from pytorch_lightning import Trainer
