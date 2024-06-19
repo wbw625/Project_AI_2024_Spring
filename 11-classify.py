@@ -96,11 +96,11 @@ class ViolenceClass:
 
 # 示例用法
 if __name__ == "__main__":
-    model_path = 'train_logs\\resnet18_pretrain_test\\version_2\\checkpoints\\resnet18_pretrain_test-epoch=26-val_loss=0.03.ckpt'
+    model_path = 'train_logs\\resnet18_pretrain_test\\version_8\\checkpoints\\resnet18_pretrain_test-epoch=23-val_loss=0.08.ckpt'
     classifier = ViolenceClass(model_path)
-    folder_path = 'violence_224/val'
+    # folder_path = 'violence_224/val'
     # folder_path = 'train set 2'
-    # folder_path = 'train set 3'
+    folder_path = 'train set 3'
     # folder_path = 'violence_224/test'
     folder_predictions = classifier.classify_folder(folder_path)
     print(f'Folder image predictions: {folder_predictions}')
