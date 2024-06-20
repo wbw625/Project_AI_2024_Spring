@@ -5,7 +5,7 @@ import os
 script_dir = os.path.dirname(__file__)
 
 # 相对路径到目标目录
-target_dir = os.path.join(script_dir, '11-其他支持文件和目录')
+target_dir = os.path.join(script_dir, '10-其他支持文件和目录')
 
 
 import torch
@@ -116,7 +116,7 @@ class ViolenceClass:
 # 示例用法
 if __name__ == "__main__":
 
-    #model_path = os.path.join(target_dir, 'train_logs', 'resnet18_pretrain_test', 'version_7', 'checkpoints', 'resnet18_pretrain_test-epoch=10-val_loss=0.05.ckpt')
+    #model_path = os.path.join(target_dir, 'train_logs', 'resnet18_pretrain_test', 'version_2', 'checkpoints', 'resnet18_pretrain_test-epoch=15-val_loss=0.08.ckpt')
     model_path = os.path.join(target_dir, 'train_logs', 'resnet18_pretrain_test', 'version_1', 'checkpoints', 'resnet18_pretrain_test-epoch=23-val_loss=0.08.ckpt')
 
     classifier = ViolenceClass(model_path)
@@ -124,7 +124,6 @@ if __name__ == "__main__":
     folder_path = os.path.join(target_dir,'violence_224', 'test_val')
     #folder_path = os.path.join(target_dir,'violence_224', 'test_set2')
     #folder_path = os.path.join(target_dir,'violence_224', 'test_set3')
-    #folder_path = os.path.join(target_dir,'violence_224', 'test_set4')
     folder_predictions, folder_probabilities = classifier.classify_folder(folder_path)
     print(f'Folder image predictions: {folder_predictions}')
 
