@@ -7,8 +7,7 @@ from pytorch_lightning import LightningDataModule
 class CustomDataset(Dataset):
     def __init__(self, split):
         assert split in ["train", "val", "test"]
-        data_root = "E:\\code\\python\\ai_img_srt\\violence_224\\"
-        # data_root = "E:\\code\\python\\ai_img_srt\\v\\"
+        data_root = "E:\\2024-1\\Intro_to_AI\\ai_img_srt\\violence_224"
         self.data = [os.path.join(data_root, split, i) for i in os.listdir(os.path.join(data_root, split))]
         
         if split == "train":
@@ -51,6 +50,14 @@ class CustomDataModule(LightningDataModule):
         super().__init__()
         self.batch_size = batch_size
         self.num_workers = num_workers
+
+        self.transform = transforms.Compose([
+            transforms.RandomRotation(degrees=15),
+            transforms.RandomResizedCrop(size=(224, 224), scale=(0.8, 1.0)),
+            transforms.RandomHorizontalFlip(),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+        ])
 
     def setup(self, stage=None):
         self.train_dataset = CustomDataset("train")
