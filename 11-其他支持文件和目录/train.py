@@ -25,13 +25,20 @@ if __name__ == '__main__':
 
     # 实例化训练器，移除GPU相关设置
     trainer = Trainer(
-        max_epochs=40,
+        max_epochs=20,
         accelerator='cpu',  # 使用CPU进行训练
         logger=logger,
         callbacks=[checkpoint_callback]
     )
 
     # 实例化模型
-    model = ViolenceClassifier(learning_rate=lr)
+    #model = ViolenceClassifier(learning_rate=lr)
+
+    # 实例化模型并加载预训练权重
+    model_path = 'train_logs/resnet18_pretrain_continued/version_0/checkpoints/resnet18_pretrain_continued-epoch=10-val_loss=0.04.ckpt'  # 替换为之前训练模型的检查点路径
+    model = ViolenceClassifier.load_from_checkpoint(model_path, learning_rate=lr)
+
     # 开始训练
     trainer.fit(model, data_module)
+
+    
