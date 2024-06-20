@@ -1,3 +1,13 @@
+
+import os
+
+# 获取当前脚本文件的路径
+script_dir = os.path.dirname(__file__)
+
+# 相对路径到目标目录
+target_dir = os.path.join(script_dir, '11-其他支持文件和目录')
+
+
 import torch
 import os
 from torch.utils.data import DataLoader, Dataset
@@ -105,16 +115,16 @@ class ViolenceClass:
 
 # 示例用法
 if __name__ == "__main__":
-    #model_path = 'train_logs/resnet18_pretrain_continued/version_1/checkpoints/resnet18_pretrain_continued-epoch=23-val_loss=0.08.ckpt'    
-    model_path = 'train_logs/resnet18_pretrain_test/version_7/checkpoints/resnet18_pretrain_test-epoch=04-val_loss=0.06.ckpt'
-    #model_path = 'train_logs/resnet18_pretrain_test/version_6/checkpoints/resnet18_pretrain_test-epoch=05-val_loss=0.14.ckpt'
-    #model_path = 'train_logs/resnet18_pretrain_test/version_1/checkpoints/resnet18_pretrain_test-epoch=09-val_loss=0.04.ckpt'
-    #model_path = 'train_logs/resnet18_pretrain_test/version_3/checkpoints/resnet18_pretrain_test-epoch=07-val_loss=0.04.ckpt'
+
+    #model_path = os.path.join(target_dir, 'train_logs', 'resnet18_pretrain_test', 'version_7', 'checkpoints', 'resnet18_pretrain_test-epoch=10-val_loss=0.05.ckpt')
+    model_path = os.path.join(target_dir, 'train_logs', 'resnet18_pretrain_test', 'version_1', 'checkpoints', 'resnet18_pretrain_test-epoch=23-val_loss=0.08.ckpt')
+
     classifier = ViolenceClass(model_path)
-    #folder_path = 'violence_224/val'
-    #folder_path = 'violence_224/train_set2'
-    folder_path = 'violence_224/train_set3'
-    #folder_path = 'violence_224/train_set4'
+
+    folder_path = os.path.join(target_dir,'violence_224', 'test_val')
+    #folder_path = os.path.join(target_dir,'violence_224', 'test_set2')
+    #folder_path = os.path.join(target_dir,'violence_224', 'test_set3')
+    #folder_path = os.path.join(target_dir,'violence_224', 'test_set4')
     folder_predictions, folder_probabilities = classifier.classify_folder(folder_path)
     print(f'Folder image predictions: {folder_predictions}')
 
