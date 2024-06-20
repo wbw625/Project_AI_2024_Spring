@@ -77,8 +77,6 @@ class ViolenceClass:
         imgs_tensor = torch.stack(imgs)
         predictions, probabilities = self.classify(imgs_tensor)
 
-        # for img_name, pred, prob in zip(img_names, predictions, probabilities):
-        #    print(f"{img_name}: {'Violence' if pred == 1 else 'Normal'}, Confidence: {prob}")
 
         return predictions, probabilities
 
