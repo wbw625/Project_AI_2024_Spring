@@ -1,21 +1,21 @@
 # 图片暴力检测分类器
 
-该仓库提供了使用预训练的ResNet模型将图像分类为暴力或正常类别的工具。以下是classify.py接口调用实例的说明。
+以下是classify.py接口调用实例的说明。
 
 ## 模型准备
 
-确保你有预训练的模型检查点文件。在初始化 `ViolenceClass` 时可以指定该文件的路径。
+指定预训练的模型检查点文件路径。可在初始化 `ViolenceClass` 时指定。
 
 ## 文件命名约定
 
-数据集假设文件名包含标签，标签是文件名的第一部分，用下划线分隔。例如，`1_001.png` 表示该图像的标签为 `1`（暴力），`0_002.png` 表示该图像的标签为 `0`（正常）。
+数据集假设文件名包含标签，标签是文件名的第一部分，用下划线分隔。例如，`1_001.png` 表示该图像的标签为 `1`（标识为暴力），`0_002.png` 表示该图像的标签为 `0`（标识为正常）。
 并且需要确保图像格式正确（JPEG, PNG），并且正确指定文件夹路径和模型检查点路径。
 
 ## 使用方法
 
 ### 1. 分类文件夹中的图像
 
-你可以使用 `classify_folder` 方法对文件夹中的所有图像进行分类。
+使用 `classify_folder` 方法对文件夹中的所有图像进行分类。
 
 ```python
 from classify import ViolenceClass
@@ -34,11 +34,10 @@ folder_predictions, folder_probabilities = classifier.classify_folder(folder_pat
 print(f'Folder image predictions: {folder_predictions}')
 ```
 
-这将打印指定文件夹中每个图像的预测结果和置信度分数。图像将被分类为“暴力”或“正常”。
 
 ### 2. 测试模型准确率
 
-你可以使用 `test_accuracy` 方法测试模型在数据集上的准确率。
+使用 `test_accuracy` 方法测试模型在数据集上的准确率。
 
 ```python
 from classify import ViolenceClass
@@ -56,9 +55,8 @@ folder_path = os.path.join(target_dir,'violence_224', 'test_val')
 classifier.test_accuracy(folder_path)
 ```
 
-这将打印模型在指定文件夹中的测试集上的准确率。
 
-## 示例
+## 调用示例
 
 在 `classify.py` 脚本的主块中可以找到提供类的示例用法。根据你的设置修改 `model_path` 和 `folder_path` 变量，以分类图像并测试准确率。
 
@@ -76,4 +74,4 @@ if __name__ == "__main__":
     classifier.test_accuracy(folder_path)
 ```
 
-此示例初始化分类器，分类文件夹中的图像，并测试模型的准确率。你可以根据需要调整路径。
+此示例初始化分类器，分类文件夹中的图像，并测试模型的准确率。可以根据需要调整路径。
