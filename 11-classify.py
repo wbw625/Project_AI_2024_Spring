@@ -77,8 +77,8 @@ class ViolenceClass:
         imgs_tensor = torch.stack(imgs)
         predictions, probabilities = self.classify(imgs_tensor)
 
-        for img_name, pred, prob in zip(img_names, predictions, probabilities):
-            print(f"{img_name}: {'Violence' if pred == 1 else 'Normal'}, Confidence: {prob}")
+        # for img_name, pred, prob in zip(img_names, predictions, probabilities):
+        #    print(f"{img_name}: {'Violence' if pred == 1 else 'Normal'}, Confidence: {prob}")
 
         return predictions, probabilities
 
@@ -107,12 +107,16 @@ class ViolenceClass:
 
 # 示例用法
 if __name__ == "__main__":
-    #model_path = 'train_logs/resnet50_pretrain_test/version_0/checkpoints/resnet50_pretrain_test-epoch=05-val_loss=0.14.ckpt'
+    #model_path = 'train_logs/resnet18_pretrain_continued/version_1/checkpoints/resnet18_pretrain_continued-epoch=23-val_loss=0.08.ckpt'    
+    model_path = 'train_logs/resnet18_pretrain_test/version_7/checkpoints/resnet18_pretrain_test-epoch=04-val_loss=0.06.ckpt'
     #model_path = 'train_logs/resnet18_pretrain_test/version_6/checkpoints/resnet18_pretrain_test-epoch=05-val_loss=0.14.ckpt'
     #model_path = 'train_logs/resnet18_pretrain_test/version_1/checkpoints/resnet18_pretrain_test-epoch=09-val_loss=0.04.ckpt'
-    model_path = 'train_logs/resnet18_pretrain_test/version_3/checkpoints/resnet18_pretrain_test-epoch=07-val_loss=0.04.ckpt'
+    #model_path = 'train_logs/resnet18_pretrain_test/version_3/checkpoints/resnet18_pretrain_test-epoch=07-val_loss=0.04.ckpt'
     classifier = ViolenceClass(model_path)
-    folder_path = 'violence_224/val'
+    #folder_path = 'violence_224/val'
+    #folder_path = 'violence_224/train_set2'
+    folder_path = 'violence_224/train_set3'
+    #folder_path = 'violence_224/train_set4'
     folder_predictions, folder_probabilities = classifier.classify_folder(folder_path)
     print(f'Folder image predictions: {folder_predictions}')
 
