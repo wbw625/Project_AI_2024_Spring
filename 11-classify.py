@@ -1,9 +1,5 @@
-import sys
-sys.path.insert(0, './11-其他支持文件和目录')
-
 import torch
 import os
-from pytorch_lightning import Trainer
 from torch.utils.data import DataLoader, Dataset
 import torchvision.transforms as transforms
 from PIL import Image
@@ -44,21 +40,25 @@ class ViolenceClass:
         self.device = 'cpu'  # 使用CPU
         os.environ["CUDA_VISIBLE_DEVICES"] = ""  # 禁用GPU
         self.VioCL = ViolenceClassifier.load_from_checkpoint(model_path).to(device=self.device)
-        self.trainer = Trainer(accelerator='cpu', devices=1)  # 使用CPU
+        self.VioCL.eval()  # 设置模型为评估模式
 
     def classify(self, imgs: torch.Tensor):
-        pred_dataloader = DataLoader(imgs, batch_size=imgs.size(0))
+        imgs = imgs.to(self.device)
         with torch.no_grad():
-            prediction_scores = self.trainer.predict(self.VioCL, dataloaders=pred_dataloader, return_predictions=True)
-        return [1 if score[1] > score[0] else 0 for score in prediction_scores[0]]
+            outputs = self.VioCL(imgs)
+            probabilities = torch.sigmoid(outputs)
+            predictions = (probabilities[:, 1] > 0.5).long()
+        return predictions.cpu().tolist(), probabilities.cpu().tolist()
 
     def classify_folder(self, folder_path):
         transform = transforms.Compose([
             transforms.Resize((224, 224)),
-            transforms.ToTensor()
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         ])
 
         imgs = []
+        img_names = []
         print(f"Reading images from folder: {folder_path}")
         for filename in os.listdir(folder_path):
             if filename.lower().endswith(('.jpg', '.jpeg', '.png')):
@@ -66,6 +66,7 @@ class ViolenceClass:
                 try:
                     image = Image.open(img_path).convert('RGB')
                     imgs.append(transform(image))
+                    img_names.append(filename)
                 except Exception as e:
                     print(f"Error reading {img_path}: {e}")
 
@@ -73,12 +74,19 @@ class ViolenceClass:
             print(f"No images found in folder: {folder_path}")
             return []
 
-        return self.classify(torch.stack(imgs))
+        imgs_tensor = torch.stack(imgs)
+        predictions, probabilities = self.classify(imgs_tensor)
+
+        for img_name, pred, prob in zip(img_names, predictions, probabilities):
+            print(f"{img_name}: {'Violence' if pred == 1 else 'Normal'}, Confidence: {prob}")
+
+        return predictions, probabilities
 
     def test_accuracy(self, folder_path):
         transform = transforms.Compose([
             transforms.Resize((224, 224)),
-            transforms.ToTensor()
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         ])
 
         dataset = ViolenceDataset(folder_path, transform=transform)
@@ -87,10 +95,10 @@ class ViolenceClass:
         correct = 0
         total = 0
         for imgs, labels in dataloader:
-            imgs = imgs.to(self.device)  
-            labels = labels.to(self.device)  
-            preds = self.classify(imgs)
-            correct += (torch.tensor(preds).to(self.device) == labels).sum().item()  # 确保预测结果在正确的设备上
+            imgs = imgs.to(self.device)
+            labels = labels.to(self.device)
+            preds, _ = self.classify(imgs)
+            correct += (torch.tensor(preds).to(self.device) == labels).sum().item()
             total += labels.size(0)
 
         accuracy = correct / total
@@ -99,13 +107,13 @@ class ViolenceClass:
 
 # 示例用法
 if __name__ == "__main__":
-    model_path = 'train_logs\\resnet18_pretrain_test\\version_8\\checkpoints\\resnet18_pretrain_test-epoch=23-val_loss=0.08.ckpt'
+    #model_path = 'train_logs/resnet50_pretrain_test/version_0/checkpoints/resnet50_pretrain_test-epoch=05-val_loss=0.14.ckpt'
+    #model_path = 'train_logs/resnet18_pretrain_test/version_6/checkpoints/resnet18_pretrain_test-epoch=05-val_loss=0.14.ckpt'
+    #model_path = 'train_logs/resnet18_pretrain_test/version_1/checkpoints/resnet18_pretrain_test-epoch=09-val_loss=0.04.ckpt'
+    model_path = 'train_logs/resnet18_pretrain_test/version_3/checkpoints/resnet18_pretrain_test-epoch=07-val_loss=0.04.ckpt'
     classifier = ViolenceClass(model_path)
-    # folder_path = 'violence_224/val'
-    # folder_path = 'train set 2'
-    folder_path = 'train set 3'
-    # folder_path = 'violence_224/test'
-    folder_predictions = classifier.classify_folder(folder_path)
+    folder_path = 'violence_224/val'
+    folder_predictions, folder_probabilities = classifier.classify_folder(folder_path)
     print(f'Folder image predictions: {folder_predictions}')
 
     classifier.test_accuracy(folder_path)
