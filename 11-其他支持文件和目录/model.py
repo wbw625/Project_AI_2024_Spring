@@ -14,8 +14,8 @@ class ViolenceClassifier(LightningModule):
         self.model.fc = nn.Linear(num_ftrs, num_classes)
 
         self.learning_rate = learning_rate
-        # 定义权重，假设类别0的权重为?，类别1的权重为1
-        weights = torch.tensor([15, 1], dtype=torch.float)
+        # 定义权重，假设类别0的权重为10，类别1的权重为1
+        weights = torch.tensor([10, 1], dtype=torch.float)
         # 定义新的损失函数
         self.loss_fn = BCEWithLogitsLoss(pos_weight=weights)
         self.accuracy = Accuracy(task="multiclass", num_classes=2)
@@ -33,6 +33,7 @@ class ViolenceClassifier(LightningModule):
         # 将目标转换为one-hot编码
         y_onehot = F.one_hot(y, num_classes=2)
         loss = self.loss_fn(logits, y_onehot.float())
+        self.log('train_loss', loss)
         return loss
     
     def validation_step(self, batch, batch_idx):
@@ -40,7 +41,10 @@ class ViolenceClassifier(LightningModule):
         logits = self(x)
         y_onehot = F.one_hot(y, num_classes=2)
         val_loss = self.loss_fn(logits, y_onehot.float())
+        acc = self.accuracy(logits, y)
         self.log('val_loss', val_loss)
+        self.log('val_acc', acc)
+        return val_loss
 
     def test_step(self, batch, batch_idx):
         x, y = batch
